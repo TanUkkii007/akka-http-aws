@@ -8,7 +8,6 @@ import akka.util.ByteString
 import com.amazonaws.{DefaultRequest, AmazonWebServiceResponse, Request}
 import com.amazonaws.http.{HttpResponseHandler, HttpMethodName, HttpResponse => AWSHttpResponse}
 import com.amazonaws.transform.Marshaller
-import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream
 import scala.collection.JavaConversions._
 import java.net.URI
 
@@ -73,7 +72,7 @@ trait AWSClientConversions {
     convertFromHttpResponseToSource(response).runWith(Sink.head)(materializer)
   }
 
-  private val byteBufferInputStreamFlow = Flow[ByteString].fold(ByteString())(_ ++ _).map(byteString => new ByteBufferBackedInputStream(byteString.asByteBuffer))
+  private val byteBufferInputStreamFlow = Flow[ByteString].fold(ByteString())(_ ++ _).map(_.iterator.asInputStream)
 }
 
 object AWSClientConversions extends AWSClientConversions

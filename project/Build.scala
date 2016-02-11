@@ -23,7 +23,10 @@ object Build extends Build {
     base = file("akka-http-dynamodb"),
     settings = buildSettings ++ Seq(
       resolvers ++= Seq("DynamoDBLocal" at "http://dynamodb-local.s3-website-us-west-2.amazonaws.com/release"),
-      libraryDependencies += dynamodb_local
+      libraryDependencies ++= Seq(
+        awssdk_dynamodb,
+        dynamodb_local
+      )
     )
   ).dependsOn(akka_http_aws)
 
@@ -34,7 +37,8 @@ object Dependencies {
   val akka_version = "2.4.1"
   val akka_stream_version = "2.0.2"
   val scalatest_version = "2.2.6"
-  val aws = "com.amazonaws" % "aws-java-sdk" % aws_sdk_version % "compile"
+  val awssdk_core = "com.amazonaws" % "aws-java-sdk-core" % aws_sdk_version % "compile"
+  val awssdk_dynamodb = "com.amazonaws" % "aws-java-sdk-dynamodb" % aws_sdk_version % "compile"
   val dynamodb_local = "com.amazonaws" % "DynamoDBLocal" % "1.10.5.1" % "test"
   val akka = "com.typesafe.akka" %% "akka-actor" % akka_version % "compile"
   val akka_stream = "com.typesafe.akka" %% "akka-stream-experimental" % akka_stream_version % "compile"
@@ -42,5 +46,5 @@ object Dependencies {
   val akka_testkit = "com.typesafe.akka" %% "akka-testkit" % akka_version % "test"
   val scalaTest   = "org.scalatest" %% "scalatest" % scalatest_version % "test"
 
-  val coreDependencies = Seq(aws, akka, akka_stream, akka_http_core, akka_testkit, scalaTest)
+  val coreDependencies = Seq(awssdk_core, akka, akka_stream, akka_http_core, akka_testkit, scalaTest)
 }

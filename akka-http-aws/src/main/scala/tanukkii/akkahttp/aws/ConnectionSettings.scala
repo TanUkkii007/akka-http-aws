@@ -3,7 +3,7 @@ package tanukkii.akkahttp.aws
 import java.net.InetSocketAddress
 
 import akka.event.LoggingAdapter
-import akka.http.ClientConnectionSettings
+import akka.http.scaladsl.settings.ClientConnectionSettings
 import com.amazonaws.auth.AWSCredentialsProvider
 
 case class ConnectionSettings(host: String,

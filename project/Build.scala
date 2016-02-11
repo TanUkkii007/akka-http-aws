@@ -36,14 +36,14 @@ object Build extends Build {
 
 object Dependencies {
   val aws_sdk_version = "1.10.49"
-  val akka_version = "2.4.1"
+  val akka_version = "2.4.2-RC2"
   val akka_stream_version = "2.0.2"
   val scalatest_version = "2.2.6"
   val awssdk_core = "com.amazonaws" % "aws-java-sdk-core" % aws_sdk_version % "compile"
   val awssdk_dynamodb = "com.amazonaws" % "aws-java-sdk-dynamodb" % aws_sdk_version % "compile"
   val akka = "com.typesafe.akka" %% "akka-actor" % akka_version % "compile"
-  val akka_stream = "com.typesafe.akka" %% "akka-stream-experimental" % akka_stream_version % "compile"
-  val akka_http_core = "com.typesafe.akka" %% "akka-http-core-experimental" % akka_stream_version % "compile"
+  val akka_stream = "com.typesafe.akka" %% "akka-stream" % akka_version % "compile"
+  val akka_http_core = "com.typesafe.akka" %% "akka-http-core" % akka_version % "compile"
   val akka_testkit = "com.typesafe.akka" %% "akka-testkit" % akka_version % "test"
   val scalaTest   = "org.scalatest" %% "scalatest" % scalatest_version % "test"
 

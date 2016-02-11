@@ -1,3 +1,4 @@
+import com.teambytes.sbt.dynamodb.DynamoDBLocal
 import sbt._
 import Keys._
 import Dependencies._
@@ -22,11 +23,12 @@ object Build extends Build {
     id = "akka-http-dynamodb",
     base = file("akka-http-dynamodb"),
     settings = buildSettings ++ Seq(
-      resolvers ++= Seq("DynamoDBLocal" at "http://dynamodb-local.s3-website-us-west-2.amazonaws.com/release"),
       libraryDependencies ++= Seq(
-        awssdk_dynamodb,
-        dynamodb_local
+        awssdk_dynamodb
       )
+    ) ++ DynamoDBLocal.settings ++ Seq(
+      DynamoDBLocal.Keys.dynamoDBLocalDownloadDirectory := file("dynamodb-local"),
+      test in Test <<= (test in Test).dependsOn(DynamoDBLocal.Keys.startDynamoDBLocal)
     )
   ).dependsOn(akka_http_aws)
 
@@ -39,7 +41,6 @@ object Dependencies {
   val scalatest_version = "2.2.6"
   val awssdk_core = "com.amazonaws" % "aws-java-sdk-core" % aws_sdk_version % "compile"
   val awssdk_dynamodb = "com.amazonaws" % "aws-java-sdk-dynamodb" % aws_sdk_version % "compile"
-  val dynamodb_local = "com.amazonaws" % "DynamoDBLocal" % "1.10.5.1" % "test"
   val akka = "com.typesafe.akka" %% "akka-actor" % akka_version % "compile"
   val akka_stream = "com.typesafe.akka" %% "akka-stream-experimental" % akka_stream_version % "compile"
   val akka_http_core = "com.typesafe.akka" %% "akka-http-core-experimental" % akka_stream_version % "compile"

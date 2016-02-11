@@ -15,7 +15,6 @@ class DynamoDBClientTest extends TestKit(ActorSystem("DynamoDBClientTest"))
 with WordSpecLike
 with DiagrammedAssertions
 with BeforeAndAfterAll
-with DynamoDBTestSupport
 with MarshallersAndUnmarshallers {
 
   implicit var connectionFlow: HttpConnectionFlow = _

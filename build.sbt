@@ -6,9 +6,9 @@ val commonSettings = Seq(
   libraryDependencies ++= coreDependencies
 )
 
-lazy val root = project in file(".") aggregate(`akka-http-aws`, `akka-http-dynamodb`)
+lazy val root = project in file(".") aggregate(`akka-http-aws-core`, `akka-http-dynamodb`)
 
-lazy val `akka-http-aws` = (project in file("akka-http-aws"))
+lazy val `akka-http-aws-core` = (project in file("akka-http-aws-core"))
   .settings(commonSettings)
 
 lazy val `akka-http-dynamodb` = (project in file("akka-http-dynamodb"))
@@ -22,4 +22,4 @@ lazy val `akka-http-dynamodb` = (project in file("akka-http-dynamodb"))
     DynamoDBLocal.Keys.dynamoDBLocalDownloadDirectory := file("dynamodb-local"),
     test in Test <<= (test in Test).dependsOn(DynamoDBLocal.Keys.startDynamoDBLocal)
   )
-).dependsOn(`akka-http-aws`)
+).dependsOn(`akka-http-aws-core`)

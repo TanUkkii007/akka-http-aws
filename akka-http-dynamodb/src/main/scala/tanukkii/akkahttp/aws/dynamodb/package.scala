@@ -1,46 +1,60 @@
 package tanukkii.akkahttp.aws
 
 import com.amazonaws.AmazonServiceException
-import com.amazonaws.http.{HttpResponseHandler, JsonErrorResponseHandlerV2}
-import com.amazonaws.transform.JsonErrorUnmarshallerV2
-
-import scala.collection.JavaConversions._
+import com.amazonaws.http.HttpResponseHandler
+import com.amazonaws.protocol.json.{JsonErrorResponseMetadata, JsonErrorShapeMetadata, JsonClientMetadata, SdkJsonProtocolFactory}
 
 package object dynamodb {
   implicit object DynamoDBServiceContext extends AWSServiceContext[DynamoDBService] {
-    val service: DynamoDBService = DynamoDBService()
 
-    private val dynamoExceptionUnmarshallers = List(
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.ResourceInUseException],
-        "ResourceInUseException"
-      ),
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.ItemCollectionSizeLimitExceededException],
-        "ItemCollectionSizeLimitExceededException"
-      ),
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.LimitExceededException],
-        "LimitExceededException"
-      ),
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException],
-        "ConditionalCheckFailedException"
-      ),
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException],
-        "ProvisionedThroughputExceededException"
-      ),
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.InternalServerErrorException],
-        "InternalServerError"
-      ),
-      new JsonErrorUnmarshallerV2(
-        classOf[com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException],
-        "ResourceNotFoundException"
-      ),
-      JsonErrorUnmarshallerV2.DEFAULT_UNMARSHALLER)
+    override val service: DynamoDBService = DynamoDBService()
 
-    val errorResponseHandler: HttpResponseHandler[AmazonServiceException] = new JsonErrorResponseHandlerV2(dynamoExceptionUnmarshallers)
+    val protocolFactory: SdkJsonProtocolFactory = new SdkJsonProtocolFactory(
+      new JsonClientMetadata()
+        .withProtocolVersion("1.0")
+        .withSupportsCbor(false)
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode(
+              "ItemCollectionSizeLimitExceededException")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.ItemCollectionSizeLimitExceededException]))
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode("ResourceInUseException")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.ResourceInUseException]))
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode("ResourceNotFoundException")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException]))
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode(
+              "ProvisionedThroughputExceededException")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException]))
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode(
+              "ConditionalCheckFailedException")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException]))
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode("InternalServerError")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.InternalServerErrorException]))
+        .addErrorMetadata(
+          new JsonErrorShapeMetadata()
+            .withErrorCode("LimitExceededException")
+            .withModeledClass(
+              classOf[com.amazonaws.services.dynamodbv2.model.LimitExceededException]))
+        .withBaseServiceExceptionClass(
+          classOf[com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException]))
+
+    override val errorResponseHandler: HttpResponseHandler[AmazonServiceException] = protocolFactory
+      .createErrorResponseHandler(new JsonErrorResponseMetadata())
   }
 }

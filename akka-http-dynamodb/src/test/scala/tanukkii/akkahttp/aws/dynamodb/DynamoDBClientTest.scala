@@ -14,8 +14,7 @@ import scala.concurrent.Await
 class DynamoDBClientTest extends TestKit(ActorSystem("DynamoDBClientTest"))
 with WordSpecLike
 with DiagrammedAssertions
-with BeforeAndAfterAll
-with MarshallersAndUnmarshallers {
+with BeforeAndAfterAll {
 
   implicit var connectionFlow: HttpConnectionFlow = _
 

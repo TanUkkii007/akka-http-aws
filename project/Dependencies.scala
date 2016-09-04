@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  val aws_sdk_version = "1.10.49"
+  val aws_sdk_version = "1.11.31"
   val akka_version = "2.4.2-RC2"
   val akka_stream_version = "2.0.2"
   val scalatest_version = "2.2.6"

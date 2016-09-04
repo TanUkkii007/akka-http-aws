@@ -8,7 +8,9 @@ import scala.concurrent.Future
 
 trait DynamoDBClient extends AWSClient {
   import AWSClientConversions._
-  import MarshallersAndUnmarshallers._
+
+  private val mu = MarshallersAndUnmarshallers(DynamoDBServiceContext.protocolFactory)
+  import mu._
 
   def listTables(request: ListTablesRequest)(implicit cf: ConnectionFlow[HttpRequest, HttpResponse], mat: Materializer): Future[ListTablesResult] = {
     sendRequest(request).flatMap(response => convertFromHttpResponse[ListTablesResult, DynamoDBService](response))(mat.executionContext)

@@ -1,10 +1,9 @@
 package tanukkii.akkahttp.aws
 
-import akka.http.scaladsl.Http.OutgoingConnection
+import akka.http.scaladsl.Http.{HostConnectionPool, OutgoingConnection}
 import akka.stream.scaladsl.Flow
 import com.amazonaws.auth.{AWS4Signer, Signer, AWSCredentialsProvider}
-
-import scala.concurrent.Future
+import scala.util.Try
 
 trait ConnectionFlow[In, Out] {
   val doubleUrlEncoding: Boolean
@@ -21,5 +20,5 @@ trait ConnectionFlow[In, Out] {
     s
   }
 
-  val connectionFlow: Flow[In, Out, Future[OutgoingConnection]]
+  val connectionFlow: Flow[(In, Int), (Try[Out], Int), HostConnectionPool]
 }

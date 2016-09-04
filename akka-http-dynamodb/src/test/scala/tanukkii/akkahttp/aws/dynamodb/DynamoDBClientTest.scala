@@ -24,6 +24,8 @@ with ScalaFutures {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(Span(3000, Millis), Span(500, Millis))
 
+  implicit val materializer = ActorMaterializer()
+
   implicit var connectionFlow: HttpConnectionFlow = _
 
   override def beforeAll() = {
@@ -42,7 +44,6 @@ with ScalaFutures {
   }
 
   "DynamoDBClient" must {
-    implicit val materializer = ActorMaterializer()
 
     val tableName = "test-table"
 

@@ -12,6 +12,7 @@ trait HttpClient {
   }
 
   def sendRequestWithFuture(httpRequest: Future[HttpRequest])(implicit cf: ConnectionFlow[HttpRequest, HttpResponse], mat: Materializer): Future[HttpResponse] = {
+    import mat.executionContext
     HttpRequestSource.fromFuture(httpRequest).runWith(Sink.head)(mat)
   }
 }

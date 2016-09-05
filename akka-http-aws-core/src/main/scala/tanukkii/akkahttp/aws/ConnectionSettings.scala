@@ -7,7 +7,7 @@ import akka.http.scaladsl.settings.ClientConnectionSettings
 import com.amazonaws.auth.AWSCredentialsProvider
 
 case class ConnectionSettings(host: String,
-                              port: Int = 80,
+                              port: Int = 443,
                               credentialsProvider: AWSCredentialsProvider,
                               localAddress: Option[InetSocketAddress] = None,
                               settings: Option[ClientConnectionSettings] = None,

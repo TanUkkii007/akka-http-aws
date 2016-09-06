@@ -11,6 +11,7 @@ import com.amazonaws.http.{HttpResponseHandler, HttpMethodName, HttpResponse => 
 import com.amazonaws.transform.Marshaller
 import scala.collection.JavaConversions._
 import java.net.URI
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.collection.JavaConverters._
 
@@ -32,9 +33,12 @@ trait AWSClientConversions {
     val awsRequest = marshaller.marshall(t)
     awsRequest.setEndpoint(new URI(connectionFlow.endpoint))
     connectionFlow.signer.sign(awsRequest, connectionFlow.credentialsProvider.getCredentials)
-    val parameter = awsRequest.getParameters.asScala.flatMap(kv => kv._2.asScala.map(v => kv._1 -> v))
-    val body: Array[Byte] = if (awsRequest.getContent != null) Stream.continually(awsRequest.getContent.read).takeWhile(-1 != _).map(_.toByte).toArray else Array()
-    val contentType = MediaType.custom(Option(awsRequest.getHeaders.get("Content-Type")).getOrElse(defaultMediaType), binary = false)
+    val parameter = awsRequest.getParameters.asScala.flatMap(kv => kv._2.asScala.map(v => kv._1 -> v)).toSeq.sorted
+    val entity = if (awsRequest.getContent != null) {
+      val body = Stream.continually(awsRequest.getContent.read).takeWhile(-1 != _).map(_.toByte).toArray
+      val contentType = MediaType.custom(Option(awsRequest.getHeaders.get("Content-Type")).getOrElse(defaultMediaType), binary = false)
+      HttpEntity(ContentType(contentType, () => HttpCharsets.`UTF-8`), body)
+    } else HttpEntity.Empty
     val uri = Option(awsRequest.getResourcePath).filter(_.length > 0).getOrElse("/")
     val headers = awsRequest.getHeaders.toList.withFilter {
       case ("Host", _) => false
@@ -48,7 +52,7 @@ trait AWSClientConversions {
     }.collect {
       case ParsingResult.Ok(header, _) => header
     }
-    HttpRequest(method = awsRequest.getHttpMethod, uri = Uri(uri).withQuery(Query(parameter.toSeq: _*)), headers = headers, entity = HttpEntity(ContentType(contentType, () => HttpCharsets.`UTF-8`), body))
+    HttpRequest(method = awsRequest.getHttpMethod, uri = Uri(uri).withQuery(Query(parameter: _*)), headers = headers, entity = entity)
   }
 
   implicit def convertFromHttpResponseToSource[T, S <: AWSService](response: HttpResponse)(implicit handler: HttpResponseHandler[AmazonWebServiceResponse[T]], serviceContext: AWSServiceContext[S]): Source[T, Any] = {

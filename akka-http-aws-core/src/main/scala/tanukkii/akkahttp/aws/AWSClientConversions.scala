@@ -6,12 +6,12 @@ import akka.http.scaladsl.model._
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source, Flow}
 import akka.util.ByteString
+import com.amazonaws.util.SdkHttpUtils
 import com.amazonaws.{DefaultRequest, AmazonWebServiceResponse, Request}
 import com.amazonaws.http.{HttpResponseHandler, HttpMethodName, HttpResponse => AWSHttpResponse}
 import com.amazonaws.transform.Marshaller
 import scala.collection.JavaConversions._
 import java.net.URI
-import scala.collection.mutable
 import scala.concurrent.Future
 import scala.collection.JavaConverters._
 
@@ -33,13 +33,19 @@ trait AWSClientConversions {
     val awsRequest = marshaller.marshall(t)
     awsRequest.setEndpoint(new URI(connectionFlow.endpoint))
     connectionFlow.signer.sign(awsRequest, connectionFlow.credentialsProvider.getCredentials)
-    val parameter = awsRequest.getParameters.asScala.flatMap(kv => kv._2.asScala.map(v => kv._1 -> v)).toSeq.sorted
+    val parameter = awsRequest.getParameters.iterator.flatMap(kv => kv._2.asScala.map(v => kv._1 -> v)).toSeq
     val entity = if (awsRequest.getContent != null) {
       val body = Stream.continually(awsRequest.getContent.read).takeWhile(-1 != _).map(_.toByte).toArray
       val contentType = MediaType.custom(Option(awsRequest.getHeaders.get("Content-Type")).getOrElse(defaultMediaType), binary = false)
       HttpEntity(ContentType(contentType, () => HttpCharsets.`UTF-8`), body)
+    } else if (SdkHttpUtils.usePayloadForQueryParameters(awsRequest)) {
+      FormData(parameter: _*).toEntity
     } else HttpEntity.Empty
-    val uri = Option(awsRequest.getResourcePath).filter(_.length > 0).getOrElse("/")
+    val uri = {
+      val s = Option(awsRequest.getResourcePath).filter(_.length > 0).getOrElse("/")
+      if (SdkHttpUtils.usePayloadForQueryParameters(awsRequest)) Uri(s)
+      else Uri(s).withQuery(Query(parameter: _*))
+    }
     val headers = awsRequest.getHeaders.toList.withFilter {
       case ("Host", _) => false
       case ("User-Agent", _) => false
@@ -52,7 +58,7 @@ trait AWSClientConversions {
     }.collect {
       case ParsingResult.Ok(header, _) => header
     }
-    HttpRequest(method = awsRequest.getHttpMethod, uri = Uri(uri).withQuery(Query(parameter: _*)), headers = headers, entity = entity)
+    HttpRequest(method = awsRequest.getHttpMethod, uri = uri, headers = headers, entity = entity)
   }
 
   implicit def convertFromHttpResponseToSource[T, S <: AWSService](response: HttpResponse)(implicit handler: HttpResponseHandler[AmazonWebServiceResponse[T]], serviceContext: AWSServiceContext[S]): Source[T, Any] = {

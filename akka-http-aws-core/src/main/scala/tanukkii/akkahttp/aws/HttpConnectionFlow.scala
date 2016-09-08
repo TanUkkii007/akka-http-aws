@@ -14,12 +14,15 @@ import scala.util.Try
 case class HttpConnectionFlow(connectionSettings: ConnectionSettings, service: AWSService)(implicit system: ActorSystem, materializer: Materializer) extends ConnectionFlow[HttpRequest, HttpResponse]{
 
   val connectionFlow: Flow[(HttpRequest, Int), (Try[HttpResponse], Int), HostConnectionPool] = {
-    Http()(system).cachedHostConnectionPoolHttps[Int](connectionSettings.host, connectionSettings.port)
+    if (connectionSettings.scheme == "http")
+      Http()(system).cachedHostConnectionPool[Int](connectionSettings.host, connectionSettings.port)
+    else
+      Http()(system).cachedHostConnectionPoolHttps[Int](connectionSettings.host, connectionSettings.port)
   }
 
   val doubleUrlEncoding: Boolean = connectionSettings.doubleUrlEncoding
 
   val credentialsProvider: AWSCredentialsProvider = connectionSettings.credentialsProvider
 
-  val endpoint: String = s"https://${connectionSettings.host}:${connectionSettings.port}"
+  val endpoint: String = s"${connectionSettings.scheme}://${connectionSettings.host}:${connectionSettings.port}"
 }

@@ -31,8 +31,9 @@ with ScalaFutures {
   override def beforeAll() = {
     connectionFlow = HttpConnectionFlow(
       ConnectionSettings(
-        "localhost",
-        8000,
+        scheme = "http",
+        host = "localhost",
+        port = 8000,
         credentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("aws_access_key_id", "aws_secret_access_key"))
       ),
       DynamoDBService()

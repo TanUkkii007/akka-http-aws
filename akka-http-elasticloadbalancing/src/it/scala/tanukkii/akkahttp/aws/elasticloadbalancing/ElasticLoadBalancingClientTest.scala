@@ -3,12 +3,13 @@ package tanukkii.akkahttp.aws.elasticloadbalancing
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
-import com.amazonaws.regions.{Regions, Region}
+import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.elasticloadbalancing.model._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{Matchers, WordSpecLike}
 import tanukkii.akkahttp.aws.HttpConnectionFlow
+
 import scala.collection.JavaConverters._
 
 class ElasticLoadBalancingClientTest extends TestKit(ActorSystem("ElasticLoadBalancingClientTest"))

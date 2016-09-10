@@ -10,9 +10,13 @@ lazy val root = project in file(".") aggregate(`akka-http-aws-core`, `akka-http-
 
 lazy val `akka-http-aws-core` = (project in file("akka-http-aws-core"))
   .settings(commonSettings)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
 
 lazy val `akka-http-elasticloadbalancing` = (project in file("akka-http-elasticloadbalancing"))
   .settings(commonSettings)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
   .settings(
     Seq(
       libraryDependencies ++= Seq(
@@ -23,6 +27,8 @@ lazy val `akka-http-elasticloadbalancing` = (project in file("akka-http-elasticl
 
 lazy val `akka-http-dynamodb` = (project in file("akka-http-dynamodb"))
   .settings(commonSettings)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
   .settings(
     Seq(
     libraryDependencies ++= Seq(

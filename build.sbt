@@ -1,7 +1,7 @@
 import Dependencies._
 
 val commonSettings = Seq(
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   scalacOptions ++= Seq("-feature", "-deprecation", "-language:implicitConversions", "-language:postfixOps"),
   libraryDependencies ++= coreDependencies
 )

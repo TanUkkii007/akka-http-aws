@@ -2,7 +2,10 @@ import Dependencies._
 
 val commonSettings = Seq(
   scalaVersion := "2.11.8",
-  scalacOptions ++= Seq("-feature", "-deprecation", "-language:implicitConversions", "-language:postfixOps")
+  scalacOptions ++= Seq("-feature", "-deprecation", "-language:implicitConversions", "-language:postfixOps"),
+  organization := "github.com/TanUkkii007",
+  licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
+  homepage := Some(url("https://github.com/TanUkkii007/akka-http-aws"))
 )
 
 lazy val root = project in file(".") aggregate(`akka-http-aws-core`, `akka-http-aws-elasticloadbalancing`, `akka-http-aws-dynamodb`)

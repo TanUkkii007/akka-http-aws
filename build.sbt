@@ -8,7 +8,13 @@ val commonSettings = Seq(
   homepage := Some(url("https://github.com/TanUkkii007/akka-http-aws"))
 )
 
-lazy val root = project in file(".") aggregate(`akka-http-aws-core`, `akka-http-aws-elasticloadbalancing`, `akka-http-aws-dynamodb`)
+
+val noPublishSettings = Seq(
+  publish := (),
+  publishArtifact in Compile := false
+)
+
+lazy val root = project in file(".") settings(noPublishSettings) aggregate(`akka-http-aws-core`, `akka-http-aws-elasticloadbalancing`, `akka-http-aws-dynamodb`)
 
 lazy val `akka-http-aws-core` = (project in file("akka-http-aws-core"))
   .settings(commonSettings)

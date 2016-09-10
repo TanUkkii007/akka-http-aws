@@ -14,5 +14,6 @@ object Dependencies {
   val akka_testkit = "com.typesafe.akka" %% "akka-testkit" % akka_version % "test"
   val scalaTest   = "org.scalatest" %% "scalatest" % scalatest_version % "test"
 
-  val coreDependencies = Seq(awssdk_core, akka, akka_stream, akka_http_core, akka_testkit, scalaTest)
+  val coreDependencies = Seq(awssdk_core, akka, akka_stream, akka_http_core)
+  val testDependencies = Seq(akka_testkit, scalaTest)
 }

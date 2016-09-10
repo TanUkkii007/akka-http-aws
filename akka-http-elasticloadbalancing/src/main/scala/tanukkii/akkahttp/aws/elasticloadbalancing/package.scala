@@ -1,20 +1,17 @@
 package tanukkii.akkahttp.aws
 
-import java.util
-
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.http.{DefaultErrorResponseHandler, HttpResponseHandler}
 import com.amazonaws.services.elasticloadbalancing.model.transform._
 import com.amazonaws.transform.{Unmarshaller, StandardErrorUnmarshaller}
 import org.w3c.dom.Node
-import scala.collection.JavaConverters._
 
 package object elasticloadbalancing {
 
   implicit object ElasticLoadBalancingServiceContext extends AWSServiceContext[ElasticLoadBalancingService] {
 
-    private val exceptionUnmarshallers: util.List[Unmarshaller[AmazonServiceException, Node]] = {
-      val unmarshallers = new util.ArrayList[Unmarshaller[AmazonServiceException, Node]]
+    private val exceptionUnmarshallers: java.util.List[Unmarshaller[AmazonServiceException, Node]] = {
+      val unmarshallers = new java.util.ArrayList[Unmarshaller[AmazonServiceException, Node]]
       List(
         new UnsupportedProtocolExceptionUnmarshaller,
         new LoadBalancerAttributeNotFoundExceptionUnmarshaller,

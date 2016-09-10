@@ -130,10 +130,10 @@ trait EC2MetaDataClient {
       .runWith(Sink.head)
   }
 
-  def getRamdiskId()(implicit mat: Materializer, ec: ExecutionContext): Future[String] = {
+  def getRamdiskId()(implicit mat: Materializer, ec: ExecutionContext): Future[Option[String]] = {
     Source.single(HttpRequest(uri = Uri(metadataRoot + "/ramdisk-id")))
       .via(connectionFlow)
-      .via(stringResponseFlow())
+      .via(stringOptionResponseFlow())
       .runWith(Sink.head)
   }
 
@@ -168,14 +168,23 @@ trait EC2MetaDataClient {
   }
 
   def stringResponseFlow()(implicit mat: Materializer, ec: ExecutionContext): Flow[HttpResponse, String, NotUsed] = Flow[HttpResponse].mapAsync(1) { response =>
+    val charset = response.entity.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8)
+    response.entity.toStrict(3 seconds).flatMap { e =>
+      e.dataBytes
+        .fold(ByteString.empty)(_ ++ _)
+        .map(_.decodeString(charset)).runWith(Sink.head)
+    }
+  }
+
+  def stringOptionResponseFlow()(implicit mat: Materializer, ec: ExecutionContext): Flow[HttpResponse, Option[String], NotUsed] = Flow[HttpResponse].mapAsync(1) { response =>
     if (response.entity.isKnownEmpty()) {
-      response.discardEntityBytes().future().map(_ => "")
+      response.discardEntityBytes().future().map(_ => None)
     } else {
       val charset = response.entity.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8)
       response.entity.toStrict(3 seconds).flatMap { e =>
         e.dataBytes
           .fold(ByteString.empty)(_ ++ _)
-          .map(_.decodeString(charset)).runWith(Sink.head)
+          .map(bytes => Some(bytes.decodeString(charset))).runWith(Sink.head)
       }
     }
   }
@@ -187,7 +196,7 @@ trait EC2MetaDataClient {
       val charset = response.entity.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8)
       response.entity.toStrict(3 seconds).flatMap { e =>
         e.dataBytes
-          .via(Framing.delimiter(ByteString("\n"), maximumFrameLength = 256))
+          .via(Framing.delimiter(ByteString("\n"), maximumFrameLength = 256, allowTruncation = true))
           .map(_.decodeString(charset)).runWith(Sink.seq)
       }
     }

@@ -3,14 +3,12 @@ package tanukkii.akkahttp.aws.elasticloadbalancing
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.internal.DefaultServiceEndpointBuilder
 import com.amazonaws.regions.{Regions, Region}
 import com.amazonaws.services.elasticloadbalancing.model._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{Matchers, WordSpecLike}
-import tanukkii.akkahttp.aws.{ConnectionSettings, HttpConnectionFlow}
+import tanukkii.akkahttp.aws.HttpConnectionFlow
 import scala.collection.JavaConverters._
 
 class ElasticLoadBalancingClientTest extends TestKit(ActorSystem("ElasticLoadBalancingClientTest"))
@@ -28,15 +26,7 @@ with WordSpecLike with Matchers with ScalaFutures {
   val lbSecurityGroup = conf.getString("lb-security-group-id")
   val instanceId = conf.getString("instance-id")
 
-  val endpoint = new DefaultServiceEndpointBuilder(service.name, "https").withRegion(Region.getRegion(Regions.AP_NORTHEAST_1)).getServiceEndpoint
-
-  implicit val connectionFlow: HttpConnectionFlow = HttpConnectionFlow(
-    ConnectionSettings(
-      host = endpoint.getHost,
-      credentialsProvider = new DefaultAWSCredentialsProviderChain()
-    ),
-    ElasticLoadBalancingService()
-  )
+  implicit val connectionFlow: HttpConnectionFlow = ElasticLoadBalancingConnection(Region.getRegion(Regions.AP_NORTHEAST_1))
 
   "ElasticLoadBalancingClient" must {
 

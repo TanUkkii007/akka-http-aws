@@ -1,9 +1,8 @@
 package tanukkii.akkahttp.aws
 
-import akka.http.scaladsl.Http.{HostConnectionPool, OutgoingConnection}
+import akka.http.scaladsl.Http.HostConnectionPool
 import akka.stream.scaladsl.Flow
-import com.amazonaws.auth.{SignerFactory, AWS4Signer, Signer, AWSCredentialsProvider}
-import com.amazonaws.regions.Regions
+import com.amazonaws.auth.{AWS4Signer, Signer, AWSCredentialsProvider}
 import scala.util.Try
 
 trait ConnectionFlow[In, Out] {
@@ -16,7 +15,9 @@ trait ConnectionFlow[In, Out] {
   val endpoint: String
 
   private [aws] lazy val signer: Signer = {
-    SignerFactory.getSigner(service.name, Regions.AP_NORTHEAST_1.getName)
+    val s = new AWS4Signer(doubleUrlEncoding)
+    s.setServiceName(service.name)
+    s
   }
 
   val connectionFlow: Flow[(In, Int), (Try[Out], Int), HostConnectionPool]
